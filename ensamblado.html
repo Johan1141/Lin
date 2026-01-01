@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carta</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:#000;
+  font-family:'Dancing Script',cursive;
+  color:#e8e8e8;
+  overflow-y:auto;
+}
+/* ===== INTRO ===== */
+#intro{
+  position:fixed; inset:0;
+  background:radial-gradient(circle at center,rgba(30,20,10,.95),#000 70%);
+  z-index:9999;
+  display:flex; align-items:center; justify-content:center;
+  transition:opacity 1.5s ease,transform 1.5s ease;
+}
+#intro.oculto{
+  opacity:0; pointer-events:none; transform:scale(1.2);
+}
+.intro-box{text-align:center;}
+.corazon{
+  position:relative;
+  width:120px; height:110px;
+  margin:0 auto 30px;
+  transform:rotate(-45deg);
+  background:#FFD966;
+  box-shadow:0 0 40px rgba(255,217,102,.9),0 0 80px rgba(255,180,80,.6);
+  animation:pulso 2.5s infinite;
+  cursor:pointer;
+}
+.corazon::before,.corazon::after{
+  content:''; position:absolute; width:120px; height:110px; background:#FFD966; border-radius:50%;
+}
+.corazon::before{top:-60px; left:0;}
+.corazon::after{left:60px; top:0;}
+@keyframes pulso{0%{transform:rotate(-45deg) scale(1)}50%{transform:rotate(-45deg) scale(1.12)}100%{transform:rotate(-45deg) scale(1)}}
+.intro-text{color:#FFD966;font-size:1.8rem;text-shadow:0 0 20px rgba(255,217,102,.8);}
+.intro-sub{font-family:'Shadows Into Light',cursive;color:#c9b78a;}
+/* ===== ESTRELLAS ===== */
+#galaxiaFondo{
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  z-index:0; pointer-events:none;
+}
+/* ===== CARTA ===== */
+.carta-container{
+  max-width:800px; width:90%;
+  margin:80px auto;
+  background: linear-gradient(to bottom, 
+      rgba(40,35,25,0.95) 0%,
+      rgba(50,45,35,0.95) 50%,
+      rgba(40,35,25,0.95) 100%);
+  padding:80px 70px;
+  border-radius:4px;
+  box-shadow:0 0 60px rgba(255,217,102,0.3), inset 0 0 100px rgba(0,0,0,0.3),0 20px 80px rgba(0,0,0,0.8);
+  position:relative; z-index:1;
+  border:2px solid rgba(139,115,85,0.4);
+}
+.carta-container::before{
+  content:''; position:absolute; top:0; left:0; right:0; bottom:0;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  pointer-events:none; border-radius:4px;
+}
+.carta-container::after{
+  content:''; position:absolute; top:-5px; left:-5px; right:-5px; bottom:-5px;
+  background: linear-gradient(45deg, transparent 0%, rgba(139,115,85,0.2) 50%, transparent 100%);
+  z-index:-1; filter: blur(10px); border-radius:8px;
+}
+.carta-container h1{
+  text-align:center; font-size:2.5rem; color:#FFD966; margin-bottom:40px;
+}
+.texto{font-size:1.5rem; line-height:2.2; color:#d8c9a8;}
+.cursor{display:inline-block;width:3px;height:1.3em;background:#FFD966;margin-left:4px;animation:blink .7s infinite;}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.letra.brillo{color:#FFD966;text-shadow:0 0 25px rgba(255,217,102,1);}
+.audio{text-align:center;margin-bottom:40px;}
+.audio button{background:none;border:none;font-size:2rem;color:#FFD966;cursor:pointer;}
+@media(max-width:768px){
+  .carta-container{padding:50px 35px}
+  .texto{font-size:1.25rem}
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+<div class="intro-box">
+<div class="corazon" id="abrir"></div>
+<p class="intro-text">Toca el corazón</p>
+<p class="intro-sub">para abrir la carta</p>
+</div>
+</div>
+
+<canvas id="galaxiaFondo"></canvas>
+
+<div class="carta-container" id="carta" style="display:none;">
+<h1>Cuando te miro...</h1>
+
+<div class="audio">
+  <audio id="audio">
+    <source src="a.mp3" type="audio/mpeg">
+  </audio>
+  <button id="playBtn">▶️</button>
+  <p id="estado">Reproduce la música…</p>
+</div>
+
+<div class="texto" id="texto"></div>
+</div>
+
+<script>
+/* ===== ESTRELLAS ===== */
+const canvas=document.getElementById("galaxiaFondo");
+const ctx=canvas.getContext("2d");
+function resize(){canvas.width=innerWidth; canvas.height=innerHeight;}
+resize();
+const stars=[...Array(220)].map(()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,s:Math.random()*2,v:Math.random()*.25}));
+function animate(){
+ctx.fillStyle="rgba(0,0,0,.12)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+stars.forEach(st=>{
+  st.y+=st.v;
+  if(st.y>canvas.height) st.y=0;
+  ctx.fillStyle="#fff";
+  ctx.beginPath();
+  ctx.arc(st.x,st.y,st.s,0,Math.PI*2);
+  ctx.fill();
+});
+requestAnimationFrame(animate);
+}
+animate();
+window.onresize=resize;
+
+/* ===== TEXTO ===== */
+const textoCompleto=`Hay tanto que no sé ni cómo decirlo... son demasiadas cosas y casi todas llegan al mismo tiempo 🫀✨. Pienso en lo curioso que es que, entre tanta gente, justo tú y yo coincidiéramos 🌍💫. No por destino ni amarres como dices JAJSAJ 😅, y es loco porque aun conociéndonos desde antes, eres la prueba de que el amor nace sin ser esperado 🤍.
+
+Te miro y pienso en lo orgulloso que me siento de ti 🥺, de la mujer que eres, de cómo manejas todo. Me transmites una calma que me hace sentir bonito 🌿, y cuando te miro, me fijo en los detalles que quizá no notas: en todo lo que dices incluso cuando no hablas , en tus gestos, en esas cosas que no se explican pero se sienten aquí adentro 💛.
+
+El tiempo siempre falta cuando estoy contigo ⏳💭 porque tus ojos me atrapan y tu piel me llama. Y aunque busque palabras más grandes, solo me nace decirte que estás muy bonita ✨. Bonita cuando sonríes y el mundo se inclina hacia ti ☀️; bonita cuando no dices nada y aun así me lo dices todo con la mirada 🌙.
+
+Pero también eres el deseo que me quema 🔥. Eres mi tentación y la razón de que siempre quiera ir más allá, recorrer todo de ti y no parar 💫. Me robas el aire, me enciendes la sangre y me haces querer perderme en cada rincón de ti 💭💛. Y entonces te lo digo otra vez, sin miedo y sin freno: Eres muy bonita, mi niña <3 🫶
+Te miro y no sé disimularlo; y si miro un poco más cerca, noto aquellas galaxias que antes veía lejanas 🌌, hoy tan cerca de mí... tan hermosas, tan nuestras ✨💛. 
+
+Feliz año nuevo Lin🌷💞`;
+
+let i=0;
+const cont=document.getElementById("texto");
+let cursor;
+function escribir(){
+  if(i<textoCompleto.length){
+    if(cursor) cursor.remove();
+    const span=document.createElement("span");
+    span.textContent=textoCompleto[i];
+    span.className="letra brillo";
+    cont.appendChild(span);
+    cursor=document.createElement("span");
+    cursor.className="cursor";
+    cont.appendChild(cursor);
+    setTimeout(()=>span.classList.remove("brillo"),500);
+    i++;
+    setTimeout(escribir,45);
+  }else{
+    if(cursor) cursor.remove();
+    mostrarLeerMas();
+  }
+}
+
+/* ===== INTRO CORAZON ===== */
+const abrir=document.getElementById("abrir");
+abrir.addEventListener("click",()=>{
+    const intro=document.getElementById("intro");
+    intro.classList.add("oculto");
+    setTimeout(()=>{
+        intro.remove();
+        document.getElementById("carta").style.display="block";
+        audioSetup(); // Inicia audio y texto
+    },1500);
+});
+
+/* ===== AUDIO ===== */
+function audioSetup(){
+    const audio=document.getElementById("audio");
+    const playBtn=document.getElementById("playBtn");
+    const estado=document.getElementById("estado");
+    let started=false;
+
+    playBtn.addEventListener("click",()=>{
+        if(audio.paused){
+            audio.play();
+            playBtn.textContent="⏸️";
+            estado.style.display="none";
+            if(!started){
+                started=true;
+                escribir();
+            }
+        }else{
+            audio.pause();
+            playBtn.textContent="▶️";
+        }
+    });
+}
+
+/* ===== BOTÓN LEER MÁS ===== */
+function mostrarLeerMas() {
+    const btn = document.createElement("button");
+    btn.textContent = "Cuando te veo..";
+    btn.style.marginTop = "20px";
+    btn.style.fontSize = "1.5rem";
+    btn.style.padding = "10px 20px";
+    btn.style.cursor = "pointer";
+    btn.style.background = "#FFD966";
+    btn.style.border = "none";
+    btn.style.borderRadius = "5px";
+    btn.style.color = "#000";
+
+    cont.parentNode.appendChild(btn);
+
+    btn.addEventListener("click", () => {
+        window.location.href = "w.html"; // Redirige a tu HTML 2 completo
+    });
+}
+</script>
+</body>
+</html>

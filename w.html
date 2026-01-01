@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxia del Amor 3D</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(180deg, #1a0033 0%, #330066 50%, #1a0033 100%);
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            touch-action: none;
+        }
+
+        #container {
+            width: 100%;
+            height: 100vh;
+        }
+
+        .controles {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(138, 43, 226, 0.3);
+            padding: 12px 25px;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 0.85rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(186, 85, 211, 0.5);
+            text-align: center;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.6);
+        }
+
+        .controles div {
+            display: inline-block;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div class="controles">
+        <div>Lo que siento al mirarte</div>
+       
+    </div>
+
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ============================================
+        // AUDIO
+        // ============================================
+        const audio = new Audio('b.mp3');
+        audio.loop = true;
+        
+        let audioIniciado = false;
+        document.addEventListener('click', () => {
+            if (!audioIniciado) {
+                audio.play().catch(e => console.log('Error al reproducir:', e));
+                audioIniciado = true;
+            }
+        });
+        // ============================================
+        // CONFIGURACIÓN THREE.JS
+        // ============================================
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x1a0033, 0.0002);
+        
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 10000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.getElementById('container').appendChild(renderer.domElement);
+
+        camera.position.set(0, 0, 600);
+
+        // ============================================
+        // FRASES DE AMOR
+        // ============================================
+        const frasesAmor = [
+            "💖 Te amo más que a nada",
+            "✨ Eres mi todo",
+            "💕 Mi corazón late por ti",
+            "🌟 Eres mi estrella",
+            "💫 Te amo infinitamente",
+            "❤️ Eres mi vida",
+            "💝 Mi amor eterno",
+            "🌹 Eres mi razón",
+            "💗 Te amaré siempre",
+            "⭐ Eres mi luz",
+            "💘 Mi corazón es tuyo",
+            "🌺 Eres mi felicidad",
+            "💓 Te necesito",
+            "🌸 Eres mi sueño",
+            "💞 Amor infinito",
+            "🦋 Eres mi mariposa",
+            "💖 Te adoro completamente",
+            "🌼 Mi amor verdadero",
+            "💕 Eres mi destino",
+            "🌙 Mi luna hermosa",
+            "❤️‍🔥 Me incendias el alma",
+            "💝 Eres mi universo",
+            "✨ Mi razón de ser",
+            "🌟 Eres mi milagro",
+            "💗 Te amo locamente",
+            "🎀 Eres mi princesa",
+            "💘 Mi media naranja",
+            "🌹 Eres perfecta para mí",
+            "💫 Mi estrella fugaz",
+            "💓 Eres mi respirar",
+            "🌺 Mi flor más bella",
+            "💞 Te amo con el alma",
+            "⭐ Eres mi fortuna",
+            "💖 Mi amor bonito",
+            "🌸 Eres mi primavera",
+            "❤️ Te amo cada día más",
+            "💕 Eres mi alegría",
+            "🦋 Mi mariposa dorada",
+            "💝 Eres mi tesoro",
+            "🌼 Mi flor favorita",
+            "✨ Eres mi magia",
+            "💗 Te quiero infinito",
+            "🌟 Mi estrella brillante",
+            "💘 Eres mi pasión",
+            "🌹 Mi rosa perfecta",
+            "💫 Eres mi cometa",
+            "💓 Mi latido constante",
+            "🌺 Eres mi paraíso",
+            "💞 Te amo profundamente",
+            "⭐ Eres mi galaxia",
+            "💖 Mi amor sincero",
+            "🌸 Eres mi jardín",
+            "❤️ Te amo sin medida",
+            "💕 Mi corazoncito",
+            "🦋 Eres mi libertad",
+            "💝 Mi amor puro",
+            "🌼 Eres mi campo de flores",
+            "✨ Mi brillo eterno",
+            "💗 Te amo más que ayer",
+            "🌟 Eres mi constelación",
+            "💘 Mi gran amor",
+            "🌹 Eres mi reina",
+            "💫 Mi deseo cumplido",
+            "💓 Eres mi pulso",
+            "🌙 Mi noche estrellada",
+            "🌠 Eres mi cometa",
+            "💖 Eres mi inspiración",
+            "💕 Mi amor verdadero",
+            "✨ Eres mi cielo",
+            "🌟 Mi sol radiante",
+            "💝 Eres mi hogar",
+            "🌹 Mi flor eterna",
+            "💗 Te amo sin fin",
+            "⭐ Eres mi esperanza",
+            "💘 Mi dulce amor",
+            "🦋 Eres mi sueño hecho realidad",
+            "💓 Mi razón de vivir",
+            "🌺 Eres mi oasis",
+            "💞 Te amaré por siempre",
+            "💖 Mi corazón te pertenece",
+            "🌸 Eres mi flor de cerezo",
+            "❤️ Te amo con locura",
+            "💕 Eres mi ángel",
+            "✨ Mi luz divina",
+            "🌟 Eres mi bendición",
+            "💝 Mi amor incondicional",
+            "🌹 Eres mi jardín secreto",
+            "💗 Te adoro infinitamente",
+            "⭐ Eres mi destello",
+            "💘 Mi amor eterno",
+            "🦋 Eres mi vuelo",
+            "💓 Mi corazón late fuerte",
+            "🌺 Eres mi refugio",
+            "💞 Te amo más allá",
+            "💖 Eres mi canción",
+            "🌸 Mi primavera eterna",
+            "❤️ Te amo hasta el infinito",
+            "💕 Eres mi melodía",
+            "✨ Mi estrella polar",
+            "🌟 Eres mi brújula",
+            "💝 Mi amor perfecto",
+            "🌹 Eres mi amanecer",
+            "💗 Te amo más que todo",
+            "⭐ Eres mi guía",
+            "💘 Mi amor divino",
+            "🦋 Eres mi color",
+            "💓 Mi corazón palpita",
+            "🌺 Eres mi edén",
+            "💞 Te amo eternamente",
+            "💖 Eres mi poesía",
+            "🌸 Mi flor de loto",
+            "❤️ Te amo con pasión",
+            "💕 Eres mi encanto",
+            "✨ Mi lucero",
+            "🌟 Eres mi fulgor",
+            "💝 Mi amor sublime",
+            "🌹 Eres mi atardecer",
+            "💗 Te amo con ternura",
+            "⭐ Eres mi cometa brillante",
+            "💘 Mi amor radiante",
+            "🦋 Eres mi arcoíris",
+            "💓 Mi corazón vibra",
+            "🌺 Eres mi santuario",
+            "💞 Te amo incondicionalmente",
+            "💖 Eres mi verso",
+            "🌸 Mi capullo de amor",
+            "❤️ Te amo con devoción",
+            "💕 Eres mi hechizo",
+            "✨ Mi resplandor",
+            "🌟 Eres mi aurora",
+            "💝 Mi amor celestial",
+            "🌹 Eres mi ocaso",
+            "💗 Te amo profundo",
+            "⭐ Eres mi meteoro",
+            "💘 Mi amor resplandeciente",
+            "🦋 Eres mi fantasía",
+            "💓 Mi corazón suspira",
+            "🌺 Eres mi nirvana",
+            "💞 Te amo sin límites",
+            "💖 Eres mi rima",
+            "🌸 Mi pétalo de amor",
+            "❤️ Te amo con frenesí",
+            "💕 Eres mi ensueño",
+            "✨ Mi centella",
+            "🌟 Eres mi alba",
+            "💝 Mi amor sagrado",
+            "🌹 Eres mi crepúsculo",
+            "💗 Te amo inmensamente",
+            "⭐ Eres mi astro",
+            "💘 Mi amor fulgurante",
+            "🦋 Eres mi ilusión",
+            "💓 Mi corazón se acelera",
+            "🌺 Eres mi shangri-la",
+            "💞 Te amo sin cesar",
+            "💖 Eres mi estrofa",
+            "🌸 Mi botón de rosa",
+            "❤️ Te amo con fervor",
+            "💕 Eres mi quimera",
+            "✨ Mi destello estelar",
+            "🌟 Eres mi claridad",
+            "💝 Mi amor infinito",
+            "🌹 Eres mi horizonte",
+            "💗 Te amo sin reservas",
+            "⭐ Eres mi satélite",
+            "💘 Mi amor centelleante",
+            "🦋 Eres mi fantasma",
+            "💓 Mi corazón desborda",
+            "🌺 Eres mi arcadia",
+            "💞 Te amo sin fronteras",
+            "💖 Eres mi soneto",
+            "🌸 Mi lirio de amor",
+            "❤️ Te amo con ardor",
+            "💕 Eres mi utopía",
+            "✨ Mi fulgor celeste",
+            "🌟 Eres mi luminaria",
+            "💝 Mi amor supremo",
+            "🌹 Eres mi bóveda celeste",
+            "💗 Te amo sin medida alguna",
+            "⭐ Eres mi nebulosa",
+            "💘 Mi amor refulgente",
+            "🦋 Eres mi ensoñación",
+            "💓 Mi corazón se desborda",
+            "🌺 Eres mi utopía",
+            "💞 Te amo sin condiciones",
+            "💖 Eres mi balada",
+            "🌸 Mi azucena de amor",
+            "❤️ Te amo con intensidad",
+            "💕 Eres mi elixir",
+            "✨ Mi resplandor divino",
+            "🌟 Eres mi antorcha",
+            "💝 Mi amor absoluto",
+            "🌹 Eres mi firmamento",
+            "💗 Te amo sin parar",
+            "⭐ Eres mi pulsar",
+            "💘 Mi amor brillante",
+            "🦋 Eres mi revelación",
+            "💓 Mi corazón explota",
+            "🌺 Eres mi idilio",
+            "💞 Te amo sin dudas",
+            "💖 Eres mi copla",
+            "🌸 Mi orquídea preciosa",
+            "❤️ Te amo con vehemencia",
+            "💕 Eres mi panacea",
+            "✨ Mi brillo celestial",
+            "🌟 Eres mi faro",
+            "💝 Mi amor total",
+            "🌹 Eres mi cosmos",
+            "💗 Te amo sin descanso",
+            "⭐ Eres mi quásar",
+            "💘 Mi amor luminoso",
+            "🦋 Eres mi visión",
+            "💓 Mi corazón desboca",
+            "🌺 Eres mi paraíso terrenal",
+            "💞 Te amo sin miedos",
+            "💖 Eres mi décima",
+            "🌸 Mi magnolia hermosa",
+            "❤️ Te amo con ímpetu",
+            "💕 Eres mi bálsamo",
+            "✨ Mi esplendor astral",
+            "🌟 Eres mi tea",
+            "💝 Mi amor completo",
+            "🌹 Eres mi vía láctea",
+            "💗 Te amo sin pausa",
+            "⭐ Eres mi supernova",
+            "💘 Mi amor resplandor",
+            "🦋 Eres mi aparición",
+            "💓 Mi corazón galopa",
+            "🌺 Eres mi shangri-la",
+            "💞 Te amo sin temores",
+            "💖 Eres mi haiku",
+            "🌸 Mi jazmín de amor",
+            "❤️ Te amo con brío",
+            "💕 Eres mi elíxir vital",
+            "✨ Mi fulgor inmortal",
+            "🌟 Eres mi llama",
+            "💝 Mi amor íntegro",
+            "🌹 Eres mi infinito",
+            "💗 Te amo sin tregua",
+            "⭐ Eres mi agujero negro",
+            "💘 Mi amor incandescente",
+            "🦋 Eres mi epifanía",
+            "💓 Mi corazón brinca",
+            "🌺 Eres mi cielo en tierra",
+            "💞 Te amo sin retorno",
+            "💖 Eres mi trova",
+            "🌸 Mi camelia divina",
+            "❤️ Te amo con ahínco",
+            "💕 Eres mi néctar",
+            "✨ Mi esplendor eterno",
+            "🌟 Eres mi candela",
+            "💝 Mi amor cabal",
+            "🌹 Eres mi eternidad",
+            "💗 Te amo sin freno",
+            "⭐ Eres mi big bang",
+            "💘 Mi amor deslumbrante"
+        ];
+
+        // ============================================
+        // GALAXIA ÉPICA CON ESPIRAL CENTRADA
+        // ============================================
+        const galaxiaGroup = new THREE.Group();
+        galaxiaGroup.position.set(0, 0, 0);
+
+        // NÚCLEO CENTRAL MÁS GRANDE Y BRILLANTE
+        const nucleoGeometry = new THREE.SphereGeometry(40, 32, 32);
+        const nucleoMaterial = new THREE.MeshBasicMaterial({
+            color: 0x8B4789,
+            transparent: true,
+            opacity: 0.7
+        });
+        const nucleo = new THREE.Mesh(nucleoGeometry, nucleoMaterial);
+        nucleo.position.set(0, 0, 0);
+        
+        // Borde brillante rosita
+        const bordeGeometry = new THREE.SphereGeometry(42, 32, 32);
+        const bordeMaterial = new THREE.MeshBasicMaterial({
+            color: 0xFFFFFF,
+            transparent: true,
+            opacity: 0.6,
+            side: THREE.BackSide
+        });
+        const borde = new THREE.Mesh(bordeGeometry, bordeMaterial);
+        nucleo.add(borde);
+        
+        // TEXTO "Lin 🌷" EN EL CENTRO
+        const canvasNombre = document.createElement('canvas');
+        const ctxNombre = canvasNombre.getContext('2d');
+        canvasNombre.width = 512;
+        canvasNombre.height = 128;
+        
+        // Texto con brillo especial
+        const gradientNombre = ctxNombre.createLinearGradient(0, 0, canvasNombre.width, 0);
+        gradientNombre.addColorStop(0, '#FFE6F5');
+        gradientNombre.addColorStop(0.5, '#FFFFFF');
+        gradientNombre.addColorStop(1, '#FFE6F5');
+        
+        ctxNombre.fillStyle = gradientNombre;
+        ctxNombre.font = 'bold 80px Arial';
+        ctxNombre.textAlign = 'center';
+        ctxNombre.textBaseline = 'middle';
+        ctxNombre.shadowBlur = 30;
+        ctxNombre.shadowColor = '#FF69B4';
+        ctxNombre.fillText('Lin 🌷', canvasNombre.width / 2, canvasNombre.height / 2);
+        
+        const textureNombre = new THREE.CanvasTexture(canvasNombre);
+        const materialNombre = new THREE.SpriteMaterial({
+            map: textureNombre,
+            transparent: true,
+            opacity: 1,
+            blending: THREE.AdditiveBlending
+        });
+        const spriteNombre = new THREE.Sprite(materialNombre);
+        spriteNombre.position.set(0, 0, 0);
+        spriteNombre.scale.set(180, 45, 1);
+        nucleo.add(spriteNombre);
+        
+        scene.add(nucleo);
+
+        // DISCO SUTIL MÁS GRANDE
+        const discoGeo = new THREE.CircleGeometry(600, 128);
+        const discoMat = new THREE.MeshBasicMaterial({
+            color: 0x8B4789,
+            transparent: true,
+            opacity: 0.08,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending
+        });
+        const disco = new THREE.Mesh(discoGeo, discoMat);
+        disco.rotation.x = Math.PI / 2;
+        disco.position.set(0, 0, 0);
+        scene.add(disco);
+
+        // PARTÍCULAS BRILLANTES flotando como nieve
+        const particulasGeo = new THREE.BufferGeometry();
+        const posiciones = [];
+        const colores = [];
+        const tamaños = [];
+
+        for (let i = 0; i < 3000; i++) {
+            const x = (Math.random() - 0.5) * 2000;
+            const y = (Math.random() - 0.5) * 1200;
+            const z = (Math.random() - 0.5) * 1500;
+            
+            posiciones.push(x, y, z);
+
+            // Blancos y rositas brillantes
+            const brillo = Math.random();
+            colores.push(1, 0.9 + brillo * 0.1, 0.95 + brillo * 0.05);
+            
+            tamaños.push(Math.random() * 4 + 1);
+        }
+
+        particulasGeo.setAttribute('position', new THREE.Float32BufferAttribute(posiciones, 3));
+        particulasGeo.setAttribute('color', new THREE.Float32BufferAttribute(colores, 3));
+        particulasGeo.setAttribute('size', new THREE.Float32BufferAttribute(tamaños, 1));
+
+        const particulasMat = new THREE.PointsMaterial({
+            size: 3,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending,
+            sizeAttenuation: true
+        });
+
+        const particulasFlotantes = new THREE.Points(particulasGeo, particulasMat);
+        scene.add(particulasFlotantes);
+
+        // ANILLOS HORIZONTALES MÁS SUTILES
+        for (let i = 0; i < 2; i++) {
+            const anilloGeo = new THREE.RingGeometry(60 + i * 30, 65 + i * 30, 64);
+            const anilloMat = new THREE.MeshBasicMaterial({
+                color: 0xFFB6E1,
+                transparent: true,
+                opacity: 0.15 - i * 0.05,
+                side: THREE.DoubleSide,
+                blending: THREE.AdditiveBlending
+            });
+            const anillo = new THREE.Mesh(anilloGeo, anilloMat);
+            anillo.position.set(0, 0, 0);
+            anillo.rotation.x = Math.PI / 2;
+            anillo.userData.velocidadRotacion = 0.005 + i * 0.003;
+            scene.add(anillo);
+        }
+
+        // ESTRELLAS DE FONDO - UN CHINGO
+        const estrellasGeo = new THREE.BufferGeometry();
+        const estrellasPos = [];
+        const estrellasCol = [];
+        const estrellasTam = [];
+        
+        for (let i = 0; i < 5000; i++) {
+            const x = (Math.random() - 0.5) * 4000;
+            const y = (Math.random() - 0.5) * 4000;
+            const z = (Math.random() - 0.5) * 4000;
+            estrellasPos.push(x, y, z);
+            
+            const brilloBase = Math.random() * 0.7 + 0.3;
+            estrellasCol.push(brilloBase, brilloBase, brilloBase * 0.9);
+            estrellasTam.push(Math.random() * 3 + 0.5);
+        }
+        
+        estrellasGeo.setAttribute('position', new THREE.Float32BufferAttribute(estrellasPos, 3));
+        estrellasGeo.setAttribute('color', new THREE.Float32BufferAttribute(estrellasCol, 3));
+        estrellasGeo.setAttribute('size', new THREE.Float32BufferAttribute(estrellasTam, 1));
+        
+        const estrellasMat = new THREE.PointsMaterial({
+            size: 2,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true
+        });
+        
+        const estrellas = new THREE.Points(estrellasGeo, estrellasMat);
+        scene.add(estrellas);
+
+        // AURORAS BOREALES
+        const auroraMaterial1 = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                varying vec2 vUv;
+                void main() {
+                    float wave = sin(vUv.x * 3.0 + time) * 0.5 + 0.5;
+                    float gradient = pow(1.0 - vUv.y, 2.0);
+                    vec3 color1 = vec3(0.4, 0.8, 1.0);
+                    vec3 color2 = vec3(0.8, 0.3, 1.0);
+                    vec3 finalColor = mix(color1, color2, wave);
+                    gl_FragColor = vec4(finalColor, gradient * 0.3);
+                }
+            `,
+            transparent: true,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending
+        });
+
+        const auroraMaterial2 = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                varying vec2 vUv;
+                void main() {
+                    float wave = sin(vUv.x * 2.5 - time * 0.8) * 0.5 + 0.5;
+                    float gradient = pow(1.0 - vUv.y, 2.0);
+                    vec3 color1 = vec3(1.0, 0.4, 0.8);
+                    vec3 color2 = vec3(0.5, 0.9, 1.0);
+                    vec3 finalColor = mix(color1, color2, wave);
+                    gl_FragColor = vec4(finalColor, gradient * 0.25);
+                }
+            `,
+            transparent: true,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending
+        });
+
+        // Crear varias capas de auroras
+        for (let i = 0; i < 4; i++) {
+            const auroraGeo = new THREE.PlaneGeometry(3000, 800, 32, 16);
+            const aurora = new THREE.Mesh(auroraGeo, i % 2 === 0 ? auroraMaterial1 : auroraMaterial2);
+            
+            aurora.position.y = 400 + i * 100;
+            aurora.position.z = -800 - i * 200;
+            aurora.rotation.x = 0.3;
+            
+            aurora.userData.velocidad = 0.0003 + i * 0.0001;
+            aurora.userData.offsetY = i * 0.5;
+            
+            scene.add(aurora);
+        }
+
+        // MÁS ESTRELLAS CERCANAS Y BRILLANTES
+        const estrellasExtraGeo = new THREE.BufferGeometry();
+        const estrellasExtraPos = [];
+        const estrellasExtraCol = [];
+        const estrellasExtraTam = [];
+        
+        for (let i = 0; i < 8000; i++) {
+            const x = (Math.random() - 0.5) * 5000;
+            const y = (Math.random() - 0.5) * 5000;
+            const z = (Math.random() - 0.5) * 5000;
+            estrellasExtraPos.push(x, y, z);
+            
+            const brilloBase = Math.random() * 0.8 + 0.2;
+            const tinte = Math.random();
+            if (tinte < 0.3) {
+                estrellasExtraCol.push(0.9, 0.9 * brilloBase, 1.0); // Azuladas
+            } else if (tinte < 0.6) {
+                estrellasExtraCol.push(1.0, 0.9 * brilloBase, 0.9); // Rosadas
+            } else {
+                estrellasExtraCol.push(brilloBase, brilloBase, brilloBase * 0.95); // Blancas
+            }
+            
+            estrellasExtraTam.push(Math.random() * 4 + 1);
+        }
+        
+        estrellasExtraGeo.setAttribute('position', new THREE.Float32BufferAttribute(estrellasExtraPos, 3));
+        estrellasExtraGeo.setAttribute('color', new THREE.Float32BufferAttribute(estrellasExtraCol, 3));
+        estrellasExtraGeo.setAttribute('size', new THREE.Float32BufferAttribute(estrellasExtraTam, 1));
+        
+        const estrellasExtraMat = new THREE.PointsMaterial({
+            size: 2.5,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.7,
+            sizeAttenuation: true,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const estrellasExtra = new THREE.Points(estrellasExtraGeo, estrellasExtraMat);
+        scene.add(estrellasExtra);
+
+        // CONSTELACIONES - Líneas conectando estrellas
+        const constelaciones = new THREE.Group();
+        for (let c = 0; c < 15; c++) {
+            const numEstrellas = 4 + Math.floor(Math.random() * 4);
+            const puntosConst = [];
+            
+            const centroX = (Math.random() - 0.5) * 3000;
+            const centroY = (Math.random() - 0.5) * 3000;
+            const centroZ = (Math.random() - 0.5) * 3000;
+            
+            for (let e = 0; e < numEstrellas; e++) {
+                puntosConst.push(new THREE.Vector3(
+                    centroX + (Math.random() - 0.5) * 400,
+                    centroY + (Math.random() - 0.5) * 400,
+                    centroZ + (Math.random() - 0.5) * 400
+                ));
+            }
+            
+            const constGeo = new THREE.BufferGeometry().setFromPoints(puntosConst);
+            const constMat = new THREE.LineBasicMaterial({
+                color: 0x4477ff,
+                transparent: true,
+                opacity: 0.15,
+                linewidth: 1
+            });
+            const constLinea = new THREE.LineLoop(constGeo, constMat);
+            constelaciones.add(constLinea);
+        }
+        scene.add(constelaciones);
+
+        // ============================================
+        // FRASES GIRANDO EN CÍRCULO ALREDEDOR DEL NÚCLEO
+        // ============================================
+        const frasesGroup = new THREE.Group();
+        frasesGroup.position.set(0, 0, 0);
+
+        // Crear suficientes frases para llenar el círculo (700 total)
+        const frasesExtendidas = [];
+        for (let i = 0; i < 3; i++) {
+            frasesExtendidas.push(...frasesAmor);
+        }
+        // Cortar a exactamente 700
+        frasesExtendidas.length = 700;
+
+        frasesExtendidas.forEach((texto, index) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 900;
+            canvas.height = 50;
+            
+            // Fondo muy sutil
+            ctx.fillStyle = 'rgba(139, 71, 137, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Texto blanco brillante
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            gradient.addColorStop(0, '#FFFFFF');
+            gradient.addColorStop(0.5, '#FFE6F5');
+            gradient.addColorStop(1, '#FFFFFF');
+            
+            ctx.fillStyle = gradient;
+            ctx.font = 'bold 26px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#FFFFFF';
+            ctx.fillText(texto, canvas.width / 2, canvas.height / 2);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.75,
+                blending: THREE.AdditiveBlending
+            });
+            const sprite = new THREE.Sprite(material);
+            
+            // DISTRIBUIR EN ANILLOS CIRCULARES (como capas de cebolla)
+            const numAnillos = 8;
+            const anillo = index % numAnillos;
+            const radio = 150 + (anillo * 40); // Radio del anillo
+            
+            // Ángulo inicial distribuido uniformemente
+            const frasesPerAnillo = Math.floor(frasesExtendidas.length / numAnillos);
+            const indiceFrase = Math.floor(index / numAnillos);
+            const angulo = (indiceFrase / frasesPerAnillo) * Math.PI * 2;
+            
+            // Posición en círculo
+            const x = Math.cos(angulo) * radio;
+            const z = Math.sin(angulo) * radio;
+            
+            // Altura Y con variación MÁS PLANA
+            const y = -30 + (Math.random() * 60);
+            
+            sprite.position.set(x, y, z);
+            sprite.scale.set(130, 8, 1);
+            
+            // Guardar datos para rotación
+            sprite.userData.radio = radio;
+            sprite.userData.angulo = angulo;
+            sprite.userData.velocidadAngular = 0.003 + (anillo * 0.0003); // Los anillos externos giran más rápido
+            sprite.userData.alturaY = y;
+            
+            frasesGroup.add(sprite);
+        });
+
+        scene.add(galaxiaGroup);
+        scene.add(frasesGroup);
+
+        // ============================================
+        // CONTROLES MEJORADOS
+        // ============================================
+        let mouseDown = false;
+        let mouseX = 0, mouseY = 0;
+        let targetRotX = 0, targetRotY = 0;
+        let currentRotX = 0, currentRotY = 0;
+
+        renderer.domElement.addEventListener('mousedown', (e) => {
+            mouseDown = true;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        renderer.domElement.addEventListener('mousemove', (e) => {
+            if (mouseDown) {
+                const deltaX = (e.clientX - mouseX) * 0.005;
+                const deltaY = (e.clientY - mouseY) * 0.005;
+                
+                targetRotY += deltaX;
+                targetRotX += deltaY;
+                
+                targetRotX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotX));
+                
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            }
+        });
+
+        renderer.domElement.addEventListener('mouseup', () => mouseDown = false);
+        renderer.domElement.addEventListener('mouseleave', () => mouseDown = false);
+
+        // Touch mejorado
+        let touchX = 0, touchY = 0;
+        renderer.domElement.addEventListener('touchstart', (e) => {
+            touchX = e.touches[0].clientX;
+            touchY = e.touches[0].clientY;
+        });
+
+        renderer.domElement.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            const deltaX = (e.touches[0].clientX - touchX) * 0.005;
+            const deltaY = (e.touches[0].clientY - touchY) * 0.005;
+            
+            targetRotY += deltaX;
+            targetRotX += deltaY;
+            
+            targetRotX = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, targetRotX));
+            
+            touchX = e.touches[0].clientX;
+            touchY = e.touches[0].clientY;
+        });
+
+        // Zoom suavizado
+        renderer.domElement.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            camera.position.z += e.deltaY * 0.3;
+            camera.position.z = Math.max(200, Math.min(1200, camera.position.z));
+        });
+
+        // ============================================
+        // ANIMACIÓN FLUIDA
+        // ============================================
+        let time = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Rotación suave - cámara sigue el mouse sutilmente
+            currentRotX += (targetRotX - currentRotX) * 0.03;
+            currentRotY += (targetRotY - currentRotY) * 0.03;
+
+            // FRASES GIRANDO EN CÍRCULO
+            frasesGroup.children.forEach((sprite) => {
+                // Actualizar ángulo
+                sprite.userData.angulo += sprite.userData.velocidadAngular;
+                
+                // Calcular nueva posición en círculo
+                const x = Math.cos(sprite.userData.angulo) * sprite.userData.radio;
+                const z = Math.sin(sprite.userData.angulo) * sprite.userData.radio;
+                
+                sprite.position.x = x;
+                sprite.position.z = z;
+                sprite.position.y = sprite.userData.alturaY;
+                
+                // Hacer que miren hacia afuera del círculo
+                sprite.lookAt(
+                    x * 2,
+                    sprite.userData.alturaY,
+                    z * 2
+                );
+            });
+
+            // Inclinación sutil del grupo de frases con el mouse
+            frasesGroup.rotation.x = currentRotX * 0.1;
+            frasesGroup.rotation.y = currentRotY * 0.1;
+
+            // Rotar núcleo y disco lentamente
+            nucleo.rotation.y += 0.001;
+            disco.rotation.z += 0.0005;
+
+            // ROTACIÓN 3D DE ESTRELLAS CON EL MOUSE
+            estrellas.rotation.y += 0.0001;
+            estrellas.rotation.x = currentRotX * 0.15;
+            estrellas.rotation.y += currentRotY * 0.02;
+
+            // Rotar estrellas extra con efecto 3D
+            estrellasExtra.rotation.y -= 0.00015;
+            estrellasExtra.rotation.x += 0.00005;
+            estrellasExtra.rotation.x += currentRotX * 0.2;
+            estrellasExtra.rotation.y += currentRotY * 0.025;
+
+            // Rotar constelaciones con el mouse
+            constelaciones.rotation.x = currentRotX * 0.18;
+            constelaciones.rotation.y = currentRotY * 0.022;
+
+            // Rotar partículas flotantes también
+            particulasFlotantes.rotation.x = currentRotX * 0.12;
+            particulasFlotantes.rotation.y = currentRotY * 0.015;
+
+            // Rotar anillos
+            scene.children.forEach(child => {
+                if (child.userData.velocidadRotacion) {
+                    child.rotation.z += child.userData.velocidadRotacion;
+                }
+            });
+
+            // Partículas flotando suavemente
+            const posiciones = particulasFlotantes.geometry.attributes.position.array;
+            for (let i = 0; i < posiciones.length; i += 3) {
+                posiciones[i + 1] += Math.sin(time * 0.5 + i) * 0.1;
+            }
+            particulasFlotantes.geometry.attributes.position.needsUpdate = true;
+
+            // Estrellas rotación lenta
+            estrellas.rotation.y += 0.0001;
+
+            // Rotar estrellas extra
+            estrellasExtra.rotation.y -= 0.00015;
+            estrellasExtra.rotation.x += 0.00005;
+
+            // Animar auroras
+            scene.children.forEach(child => {
+                if (child.material && child.material.uniforms && child.material.uniforms.time) {
+                    child.material.uniforms.time.value = time;
+                    
+                    // Movimiento ondulante
+                    child.position.y = child.position.y + Math.sin(time + child.userData.offsetY) * 0.3;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
